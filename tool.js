@@ -3,10 +3,7 @@
  */
 (function () {
     'use strict';
-    let querystring = require('querystring');//http请求所带的数据进行解析的模块
-    let store = require('store');//数据存储模块
-    const errorCode = [403,404,500,505];//自己和后台协商定义服务器的返回值
-    let errorToken = false;//错误提示
+    let querystring = require('querystring');//http请求所带的数据进行解析的node模块
     function numToDX(n) {
         var minus;
         if(n<0){
@@ -45,9 +42,6 @@
     function request(param,callback,type,e){
 
         /********param传入的参数，callback为回调函数，type为请求类型，e为其他项自己定义...*****/
-        //GetLocalStorage自己封装的localStorage获取
-        // let token = GetLocalStorage('token')||'';
-        // let oaUserToken = GetLocalStorage('oaUserToken')||null;
         try {
             let getUrl = url+'/'+type.type;
             console.log('fetch...',param);
@@ -55,11 +49,7 @@
                 let headers = {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json;application/x-www-form-urlencoded;multipart/form-data',
-                    // 'access-token':token,
                 };
-                // if(oaUserToken){
-                //     headers['oa-user-token'] = oaUserToken;
-                // }
                 try {
                     fetch(getUrl,{
                         method: type.method,
@@ -71,31 +61,10 @@
                             return response.json();
                         }).then(function(json) {
                         console.log('response json', json);
-                        //请求结果
-                        if(json.code == 0 || errorCode.indexOf(json.code)>-1 ){
-                            callback(json);
-                            if(errorToken){
-                                //token错误标记
-                                errorToken = false;
-                            }
-                            if(json.url&&json.url.length>0){
-                                // urlAlert(json.url);
-                                // 自定义处理
-                            }
-                        }else if(json.code == 505){
-                            if(!errorToken){
-                                // message.error("登陆已失效，需要重新登录！");
-                                // hashHistory.push('/login');
-                                // token登陆失效，自己设置转向登陆页面
-                                errorToken = true;
-                            }
-                        }else if(json.code == 403){
-                            // message403(json)
-                            // 403错误处理
-                        }else {
-                            // message.error(json.message)其他错误
-                        }
+                        //请求结果,执行回调函数
+                        callback(json);
                     }).catch(function(ex) {
+                        //请求出错
                         console.log('parsing failed', ex);
                     })
                 }catch (e){
@@ -106,12 +75,7 @@
                 let headers = {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json',
-                    // 'access-token':token,
                 };
-                // if(oaUserToken){
-                //     headers['oa-user-token'] = oaUserToken;
-                // }
-
                 try {
                     fetch(getUrl+'?'+querystring.stringify(param),{
                         method: type.method,
@@ -123,27 +87,9 @@
                             return response.json();
                         }).then(function(json) {
                         console.log('response json', json);
-                        // json.url?alert(json.url):'';
                         //请求结果
                         if(json.code == 0 || errorCode.indexOf(json.code)>-1){
                             callback(json);
-                            if(errorToken){
-                                errorToken = false;
-                            }
-                            if(json.url&&json.url.length>0){
-                                // urlAlert(json.url);
-                            }
-                        }else if(json.code == 505){
-                            if(!errorToken){
-                                // message.error("登陆已失效，需要重新登录！");
-                                // hashHistory.push('/login');
-                                errorToken = true;
-                            }
-                        }else if(json.code == 403){
-                            // message403(json)
-                        }else {
-                            // message.error(json.message)
-                        }
                     }).catch(function(ex) {
                         console.log('parsing failed', ex);
                     })
@@ -155,12 +101,7 @@
                 let headers = {
                     'Accept': 'application/json',
                     "Content-Type": "application/x-www-form-urlencoded; multipart/form-data",
-                    // 'access-token':token,
                 };
-                // if(oaUserToken){
-                //     headers['oa-user-token'] = oaUserToken;
-                // }
-
                 try {
                     fetch(getUrl,{
                         method: type.Method,
@@ -173,27 +114,9 @@
                             return response.json();
                         }).then(function(json) {
                         console.log('response json', json);
-                        // json.url?alert(json.url):'';
                         //请求结果
                         if(json.code == 0 || errorCode.indexOf(json.code)>-1){
                             callback(json);
-                            if(errorToken){
-                                errorToken = false;
-                            }
-                            if(json.url&&json.url.length>0){
-                                // urlAlert(json.url);
-                            }
-                        }else if(json.code == 505){
-                            if(!errorToken){
-                                // message.error("登陆已失效，需要重新登录！");
-                                // hashHistory.push('/login');
-                                // errorToken = true;
-                            }
-                        }else if(json.code == 403){
-                            // message403(json)
-                        }else {
-                            message.error(json.message)
-                        }
                     }).catch(function(ex) {
                         console.log('parsing failed', ex);
                     })
